@@ -3,21 +3,29 @@ import { formatCampusDate, todayOnCampus } from "@/lib/time";
 import type { MenusPayload } from "@/lib/types";
 import { SITE_DESCRIPTION, SITE_NAME, pageUrl } from "@/lib/site";
 
-export function featuredDishNames(payload: MenusPayload, limit = 8) {
+function collectDishNames(payload: MenusPayload, featuredOnly: boolean) {
   const names: string[] = [];
   for (const hall of payload.halls) {
     for (const meal of hall.meals) {
       for (const station of meal.stations) {
         if (station.extra) continue;
         for (const item of station.items) {
-          if (!item.name || names.includes(item.name)) continue;
-          names.push(item.name);
-          if (names.length >= limit) return names;
+          const name = item.name.trim();
+          if (!name || name.length > 42 || names.includes(name)) continue;
+          if (featuredOnly && !item.featured) continue;
+          names.push(name);
         }
       }
     }
   }
   return names;
+}
+
+export function featuredDishNames(payload: MenusPayload, limit = 8) {
+  const featured = collectDishNames(payload, true);
+  if (featured.length >= limit) return featured.slice(0, limit);
+  const rest = collectDishNames(payload, false).filter((name) => !featured.includes(name));
+  return [...featured, ...rest].slice(0, limit);
 }
 
 export function seoTitle(date: string, today: string) {
@@ -33,7 +41,8 @@ export function seoDescription(payload: MenusPayload, date: string, today: strin
   if (!dishes.length) {
     return `${SITE_NAME} live ${when} menus from ${halls}. See the dish, hall, and station.`;
   }
-  return `${when} at the 5Cs: ${dishes.join(", ")}. Live menus from ${halls}.`;
+  const text = `${when} at the 5Cs: ${dishes.join(", ")}. Live menus from ${halls}.`;
+  return text.length <= 160 ? text : `${text.slice(0, 157).replace(/[, ]+$/, "")}…`;
 }
 
 function dietUrl(tags: string[]) {
