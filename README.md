@@ -38,12 +38,9 @@ Crawlers get the full menu HTML (not a client-only fetch), plus:
 
 ## Deploy on Vercel (production only)
 
-This repo is meant to ship straight to production from `main`. There is no staging branch.
+This repo ships straight to production from `main` on [JPai1/5cMenu](https://github.com/JPai1/5cMenu). There is no staging branch.
 
-1. Create a GitHub repository named `5cMenu`.
-2. Import that repo in Vercel.
-3. Set the **Production Branch** to `main`.
-4. Deploy. `vercel.json` skips builds on any branch that is not `main`, so preview/staging deploys are not created.
+`vercel.json` skips builds on any branch that is not `main`.
 
 No environment variables are required. The app reads public menu pages and public JSON the colleges already expose.
 
