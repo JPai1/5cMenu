@@ -10,14 +10,14 @@ function ItemRow({ item }: { item: MenuItem }) {
     <li className="border-border/70 border-b py-2 last:border-b-0">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-foreground text-[0.95rem] leading-snug font-medium">
+          <h5 className="text-foreground text-[0.95rem] leading-snug font-medium">
             {item.name}
             {item.featured ? (
               <span className="text-primary ml-2 text-[0.7rem] font-semibold tracking-wide uppercase">
                 special
               </span>
             ) : null}
-          </p>
+          </h5>
           {item.description ? (
             <p className="text-muted-foreground mt-0.5 text-sm leading-snug">
               {item.description}

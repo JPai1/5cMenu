@@ -17,8 +17,7 @@ import type { DietTag, HallId, MealName, MenusPayload } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Search, UtensilsCrossed } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState, useTransition } from "react";
-import { Skeleton } from "@/components/ui/skeleton";
+import { useMemo, useState, useTransition } from "react";
 
 const MEAL_TABS: { id: MealName | "all"; label: string }[] = [
   { id: "all", label: "All meals" },
@@ -28,7 +27,15 @@ const MEAL_TABS: { id: MealName | "all"; label: string }[] = [
   { id: "Dinner", label: "Dinner" },
 ];
 
-export function MenuBoard({ date, today }: { date: string; today: string }) {
+export function MenuBoard({
+  initial,
+  date,
+  today,
+}: {
+  initial: MenusPayload;
+  date: string;
+  today: string;
+}) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [query, setQuery] = useState("");
@@ -36,37 +43,13 @@ export function MenuBoard({ date, today }: { date: string; today: string }) {
   const [meal, setMeal] = useState<MealName | "all">("all");
   const nowMeal = currentMealHint();
   const [hallFilter, setHallFilter] = useState<HallId | "all">("all");
-  const [initial, setInitial] = useState<MenusPayload | null>(null);
-  const [loadError, setLoadError] = useState<string | null>(null);
-  const [reloadToken, setReloadToken] = useState(0);
-
-  useEffect(() => {
-    let cancelled = false;
-    fetch(`/api/menus?date=${date}`)
-      .then(async (response) => {
-        if (!response.ok) throw new Error(`Menu request failed (${response.status})`);
-        return response.json() as Promise<MenusPayload>;
-      })
-      .then((payload) => {
-        if (cancelled) return;
-        setInitial(payload);
-        setLoadError(null);
-      })
-      .catch((error: unknown) => {
-        if (cancelled) return;
-        setLoadError(error instanceof Error ? error.message : "Could not load menus.");
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [date, reloadToken]);
 
   const dates = useMemo(() => {
     return Array.from({ length: 7 }, (_, i) => addCampusDays(today, i - 1));
   }, [today]);
 
   const q = query.trim().toLowerCase();
-  const visible = (initial?.halls ?? [])
+  const visible = initial.halls
     .filter((hall) => hallFilter === "all" || hall.hallId === hallFilter)
     .map((hall) => filterHall(hall, q, diets, meal));
 
@@ -74,8 +57,6 @@ export function MenuBoard({ date, today }: { date: string; today: string }) {
     (hall) => hall.status !== "ok" || countItems(hall) > 0 || !q,
   );
   const totalItems = shown.reduce((sum, hall) => sum + countItems(hall), 0);
-  const loading = !initial && !loadError;
-  const stale = Boolean(initial && initial.date !== date);
 
   function goToDate(nextDate: string) {
     startTransition(() => {
@@ -85,6 +66,12 @@ export function MenuBoard({ date, today }: { date: string; today: string }) {
 
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col px-4 pb-16 sm:px-6">
+      <a
+        href="#menus"
+        className="bg-primary text-primary-foreground sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-50 focus:rounded-md focus:px-3 focus:py-2"
+      >
+        Skip to menus
+      </a>
       <header className="pt-6 pb-5 sm:pt-10">
         <p className="text-primary text-xs font-semibold tracking-[0.22em] uppercase">
           Claremont Colleges
@@ -98,14 +85,14 @@ export function MenuBoard({ date, today }: { date: string; today: string }) {
             </p>
           </div>
           <div className="text-muted-foreground flex items-center gap-2 text-sm">
-            <UtensilsCrossed className="size-4" />
-            {formatCampusDate(initial?.date ?? date, "long")}
+            <UtensilsCrossed className="size-4" aria-hidden />
+            <time dateTime={initial.date}>{formatCampusDate(initial.date, "long")}</time>
           </div>
         </div>
       </header>
 
       <div className="bg-background/90 sticky top-0 z-20 -mx-4 border-b px-4 py-3 backdrop-blur-md sm:-mx-6 sm:px-6">
-        <div className="flex gap-2 overflow-x-auto pb-1">
+        <div className="flex gap-2 overflow-x-auto pb-1" role="navigation" aria-label="Menu date">
           {dates.map((chip) => {
             const selected = chip === date;
             return (
@@ -114,7 +101,8 @@ export function MenuBoard({ date, today }: { date: string; today: string }) {
                 size="sm"
                 variant={selected ? "default" : "outline"}
                 onClick={() => goToDate(chip)}
-                disabled={pending || loading}
+                disabled={pending}
+                aria-pressed={selected}
                 className="shrink-0"
               >
                 {dateChipLabel(chip, today)}
@@ -125,11 +113,12 @@ export function MenuBoard({ date, today }: { date: string; today: string }) {
 
         <div className="mt-3 flex flex-col gap-3 lg:flex-row">
           <div className="relative min-w-0 flex-1">
-            <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2" />
+            <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2" aria-hidden />
             <Input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Search dishes — birria, tofu scramble, pizza…"
+              aria-label="Search dishes"
               className="h-9 bg-white pl-8"
             />
           </div>
@@ -140,6 +129,7 @@ export function MenuBoard({ date, today }: { date: string; today: string }) {
             variant="outline"
             size="sm"
             className="flex-wrap justify-start"
+            aria-label="Dietary filters"
           >
             {DIET_OPTIONS.map((option) => (
               <ToggleGroupItem key={option.id} value={option.id}>
@@ -149,13 +139,14 @@ export function MenuBoard({ date, today }: { date: string; today: string }) {
           </ToggleGroup>
         </div>
 
-        <div className="mt-3 flex gap-2 overflow-x-auto">
+        <div className="mt-3 flex gap-2 overflow-x-auto" role="tablist" aria-label="Meal">
           {MEAL_TABS.map((tab) => (
             <Button
               key={tab.id}
               size="sm"
               variant={meal === tab.id ? "secondary" : "ghost"}
               onClick={() => setMeal(tab.id)}
+              aria-pressed={meal === tab.id}
               className={cn("shrink-0", meal === tab.id && "bg-stone-200")}
             >
               {tab.label}
@@ -166,11 +157,12 @@ export function MenuBoard({ date, today }: { date: string; today: string }) {
           ))}
         </div>
 
-        <div className="mt-2 flex gap-2 overflow-x-auto">
+        <div className="mt-2 flex gap-2 overflow-x-auto" aria-label="Dining hall">
           <Button
             size="xs"
             variant={hallFilter === "all" ? "default" : "outline"}
             onClick={() => setHallFilter("all")}
+            aria-pressed={hallFilter === "all"}
           >
             All halls
           </Button>
@@ -180,11 +172,13 @@ export function MenuBoard({ date, today }: { date: string; today: string }) {
               size="xs"
               variant={hallFilter === hall.id ? "default" : "outline"}
               onClick={() => setHallFilter(hall.id)}
+              aria-pressed={hallFilter === hall.id}
               className="shrink-0"
             >
               <span
                 className="mr-1.5 inline-block size-2 rounded-full"
                 style={{ background: hall.accent }}
+                aria-hidden
               />
               {hall.shortName}
             </Button>
@@ -193,35 +187,16 @@ export function MenuBoard({ date, today }: { date: string; today: string }) {
       </div>
 
       <p className="text-muted-foreground mt-4 text-sm">
-        {loading || pending || stale
+        {pending
           ? "Loading menus from the dining sites…"
-          : loadError
-            ? loadError
-            : `${totalItems} dishes across ${shown.filter((h) => countItems(h) > 0).length || shown.length} halls · refreshed from source sites about every 15 minutes`}
+          : `${totalItems} dishes across ${shown.filter((h) => countItems(h) > 0).length || shown.length} halls · refreshed from source sites about every 15 minutes`}
       </p>
 
-      {loadError ? (
-        <div className="border-border mt-6 rounded-2xl border border-dashed px-6 py-10 text-center">
-          <p className="font-heading text-2xl">Menus didn’t load</p>
-          <p className="text-muted-foreground mt-2 text-sm">{loadError}</p>
-          <Button className="mt-4" onClick={() => setReloadToken((n) => n + 1)}>
-            Retry
-          </Button>
-        </div>
-      ) : null}
-
-      {loading ? (
-        <div className="mt-4 grid gap-4 lg:grid-cols-2">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <Skeleton key={i} className="h-72 rounded-2xl" />
-          ))}
-        </div>
-      ) : null}
-
       <div
+        id="menus"
         className={cn(
           "mt-4 grid gap-4 lg:grid-cols-2",
-          (pending || stale) && "opacity-60",
+          pending && "opacity-60",
         )}
       >
         {shown.map((hall) => (
@@ -229,7 +204,7 @@ export function MenuBoard({ date, today }: { date: string; today: string }) {
         ))}
       </div>
 
-      {q && !loading && totalItems === 0 ? (
+      {q && totalItems === 0 ? (
         <div className="border-border mt-8 rounded-2xl border border-dashed px-6 py-10 text-center">
           <p className="font-heading text-2xl">Nothing matched “{query.trim()}”</p>
           <p className="text-muted-foreground mt-2 text-sm">
@@ -239,10 +214,16 @@ export function MenuBoard({ date, today }: { date: string; today: string }) {
       ) : null}
 
       <footer className="text-muted-foreground mt-12 border-t pt-6 text-xs leading-relaxed">
-        5cMenu reads public menus from the official dining sites and does not
-        replace them. Hours and dishes change; when something looks off, open
-        the source link on that hall. Production only — there is no staging
-        branch.
+        <p>
+          5cMenu aggregates Claremont Colleges dining: McConnell at Pitzer,
+          Malott at Scripps, Collins at CMC, Hoch-Shanahan at Harvey Mudd, and
+          Frary and Frank at Pomona. Menus are read from the official public
+          pages and do not replace them.
+        </p>
+        <p className="mt-2">
+          Hours and dishes change. When something looks off, open the source
+          link on that hall. Production only — there is no staging branch.
+        </p>
       </footer>
     </div>
   );

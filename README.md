@@ -29,6 +29,13 @@ GET /api/menus
 GET /api/menus?date=2026-09-04
 ```
 
+Crawlers get the full menu HTML (not a client-only fetch), plus:
+
+- `/robots.txt` — allow the site, disallow `/api/`
+- `/sitemap.xml` — today and nearby dates
+- `/opengraph-image` and `/twitter-image`
+- JSON-LD `Restaurant` / `Menu` markup for each hall
+
 ## Deploy on Vercel (production only)
 
 This repo is meant to ship straight to production from `main`. There is no staging branch.

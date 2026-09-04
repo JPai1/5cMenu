@@ -39,7 +39,7 @@ export const HALLS: HallConfig[] = [
     college: "Pitzer",
     collegeShort: "PZ",
     sourceUrl: "https://pitzer.cafebonappetit.com/",
-    address: "McConnell Center, Pitzer College",
+    address: "1050 N Mills Ave, Claremont, CA 91711",
     accent: "var(--hall-pitzer)",
     hours: "Weekdays 7:45a–10a / 11a–1:30p / 5–7:30p · Weekends brunch & dinner",
     source: {
@@ -55,7 +55,7 @@ export const HALLS: HallConfig[] = [
     college: "Scripps",
     collegeShort: "SC",
     sourceUrl: "https://scripps.cafebonappetit.com/",
-    address: "Scripps College",
+    address: "1030 Columbia Ave, Claremont, CA 91711",
     accent: "var(--hall-scripps)",
     hours: "Breakfast 7:30–10a · Lunch 11a–2p · Dinner 5–7:15p",
     source: {
@@ -71,7 +71,7 @@ export const HALLS: HallConfig[] = [
     college: "CMC",
     collegeShort: "CMC",
     sourceUrl: "https://collins-cmc.cafebonappetit.com/cafe/collins/",
-    address: "Claremont McKenna College",
+    address: "888 N Columbia Ave, Claremont, CA 91711",
     accent: "var(--hall-cmc)",
     hours: "Breakfast 7:30–10a · Lunch 11a–1:30p · Dinner 5–7:30p",
     source: {
@@ -88,7 +88,7 @@ export const HALLS: HallConfig[] = [
     collegeShort: "HMC",
     sourceUrl:
       "https://hmc.sodexomyway.com/en-us/locations/hoch-shanahan-dining-commons",
-    address: "301 Platt Blvd, Claremont",
+    address: "301 Platt Blvd, Claremont, CA 91711",
     accent: "var(--hall-hmc)",
     hours: "Weekdays 7:30–9:30a / 11:15a–1p / 5–7p · Weekends brunch & dinner",
     source: {
@@ -104,7 +104,7 @@ export const HALLS: HallConfig[] = [
     college: "Pomona",
     collegeShort: "PO",
     sourceUrl: "https://www.pomona.edu/administration/dining/menus/frary",
-    address: "347 E Sixth Street, Claremont",
+    address: "347 E 6th St, Claremont, CA 91711",
     accent: "var(--hall-frary)",
     hours: "Mon–Fri 7:30a–7:30p · Weekends brunch & dinner · peanut/tree-nut free",
     source: {
@@ -119,7 +119,7 @@ export const HALLS: HallConfig[] = [
     college: "Pomona",
     collegeShort: "PO",
     sourceUrl: "https://www.pomona.edu/administration/dining/menus/frank",
-    address: "260 E. Bonita Avenue, Claremont",
+    address: "260 E Bonita Ave, Claremont, CA 91711",
     accent: "var(--hall-frank)",
     hours: "Sun–Thu continental, brunch & dinner · closed Fri–Sat · peanut/tree-nut free",
     source: {
