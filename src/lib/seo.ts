@@ -12,6 +12,9 @@ function collectDishNames(payload: MenusPayload, featuredOnly: boolean) {
         for (const item of station.items) {
           const name = item.name.trim();
           if (!name || name.length > 42 || names.includes(name)) continue;
+          if (/build your own|made to order|upon request|choose your|create your|bar$/i.test(name)) {
+            continue;
+          }
           if (featuredOnly && !item.featured) continue;
           names.push(name);
         }

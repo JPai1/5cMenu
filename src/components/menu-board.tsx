@@ -56,7 +56,7 @@ export function MenuBoard({
   const shown = visible.filter(
     (hall) => hall.status !== "ok" || countItems(hall) > 0 || !q,
   );
-  const totalItems = shown.reduce((sum, hall) => sum + countItems(hall), 0);
+  const totalItems = shown.reduce((sum, hall) => sum + countItems(hall, false), 0);
 
   function goToDate(nextDate: string) {
     startTransition(() => {

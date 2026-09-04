@@ -43,10 +43,14 @@ export function filterHall(
   return { ...hall, meals };
 }
 
-export function countItems(hall: HallMenu) {
+export function countItems(hall: HallMenu, includeExtra = true) {
   return hall.meals.reduce(
     (sum, meal) =>
-      sum + meal.stations.reduce((inner, station) => inner + station.items.length, 0),
+      sum +
+      meal.stations.reduce((inner, station) => {
+        if (!includeExtra && station.extra) return inner;
+        return inner + station.items.length;
+      }, 0),
     0,
   );
 }
