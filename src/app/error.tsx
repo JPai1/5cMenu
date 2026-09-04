@@ -10,14 +10,14 @@ export default function Error({
 }) {
   return (
     <div className="mx-auto flex min-h-[70vh] w-full max-w-lg flex-col items-center justify-center px-6 text-center">
-      <p className="text-primary text-xs font-semibold tracking-[0.2em] uppercase">
-        5cMenu
+      <p className="text-[15px] font-medium tracking-tight">5C.</p>
+      <h1 className="mt-6 text-3xl font-medium tracking-tight">
+        Couldn’t load
+      </h1>
+      <p className="mt-3 text-sm text-zinc-400">
+        Try again in a moment.
       </p>
-      <h1 className="font-heading mt-2 text-3xl">Menus didn’t load</h1>
-      <p className="text-muted-foreground mt-2 text-sm">
-        The dining sites may be briefly unreachable. Try again in a moment.
-      </p>
-      <Button className="mt-6" onClick={reset}>
+      <Button className="mt-8" onClick={reset}>
         Retry
       </Button>
     </div>

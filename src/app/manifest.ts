@@ -8,12 +8,12 @@ export default function manifest(): MetadataRoute.Manifest {
     description: SITE_DESCRIPTION,
     start_url: "/",
     display: "standalone",
-    background_color: "#f6f1e8",
-    theme_color: "#3f6b4a",
+    background_color: "#0d0d0d",
+    theme_color: "#0d0d0d",
     lang: "en",
     categories: ["food", "utilities"],
     icons: [
-      { src: "/icon", sizes: "32x32", type: "image/png" },
+      { src: "/icon", sizes: "64x64", type: "image/png" },
       { src: "/apple-icon", sizes: "180x180", type: "image/png" },
     ],
   };

@@ -10,22 +10,55 @@ import {
   addCampusDays,
   currentMealHint,
   dateChipLabel,
-  formatCampusDate,
   todayOnCampus,
 } from "@/lib/time";
 import type { DietTag, HallId, MealName, MenusPayload } from "@/lib/types";
 import { cn } from "@/lib/utils";
-import { Search, UtensilsCrossed } from "lucide-react";
+import { Search } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useMemo, useState, useTransition } from "react";
+import { useMemo, useState, useTransition, type ReactNode } from "react";
 
 const MEAL_TABS: { id: MealName | "all"; label: string }[] = [
-  { id: "all", label: "All meals" },
+  { id: "all", label: "All" },
   { id: "Breakfast", label: "Breakfast" },
   { id: "Brunch", label: "Brunch" },
   { id: "Lunch", label: "Lunch" },
   { id: "Dinner", label: "Dinner" },
 ];
+
+function QuietButton({
+  pressed,
+  onClick,
+  children,
+  disabled,
+  className,
+}: {
+  pressed: boolean;
+  onClick: () => void;
+  children: ReactNode;
+  disabled?: boolean;
+  className?: string;
+}) {
+  return (
+    <Button
+      type="button"
+      size="sm"
+      variant="ghost"
+      disabled={disabled}
+      aria-pressed={pressed}
+      onClick={onClick}
+      className={cn(
+        "h-7 shrink-0 rounded-md px-2 text-[13px] font-medium hover:bg-transparent",
+        pressed
+          ? "text-white hover:text-white"
+          : "text-zinc-400 hover:text-zinc-100",
+        className,
+      )}
+    >
+      {children}
+    </Button>
+  );
+}
 
 export function MenuBoard({
   initial,
@@ -65,137 +98,128 @@ export function MenuBoard({
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col px-4 pb-16 sm:px-6">
+    <div className="mx-auto flex w-full min-w-0 max-w-6xl flex-1 flex-col px-4 pb-16 sm:px-8">
       <a
         href="#menus"
-        className="bg-primary text-primary-foreground sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-50 focus:rounded-md focus:px-3 focus:py-2"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-50 focus:rounded-md focus:border focus:border-white/10 focus:bg-white focus:px-3 focus:py-2 focus:text-sm focus:text-black"
       >
         Skip to menus
       </a>
-      <header className="pt-6 pb-5 sm:pt-10">
-        <p className="text-primary text-xs font-semibold tracking-[0.22em] uppercase">
-          Claremont Colleges
-        </p>
-        <div className="mt-1 flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <h1 className="font-heading text-4xl tracking-tight sm:text-5xl">5cMenu</h1>
-            <p className="text-muted-foreground mt-2 max-w-xl text-sm leading-relaxed sm:text-base">
-              Every dining hall, every station, pulled live from the official
-              Pitzer, Scripps, CMC, Harvey Mudd, and Pomona menus.
-            </p>
-          </div>
-          <div className="text-muted-foreground flex items-center gap-2 text-sm">
-            <UtensilsCrossed className="size-4" aria-hidden />
-            <time dateTime={initial.date}>{formatCampusDate(initial.date, "long")}</time>
-          </div>
-        </div>
-      </header>
 
-      <div className="bg-background/90 sticky top-0 z-20 -mx-4 border-b px-4 py-3 backdrop-blur-md sm:-mx-6 sm:px-6">
-        <div className="flex gap-2 overflow-x-auto pb-1" role="navigation" aria-label="Menu date">
-          {dates.map((chip) => {
-            const selected = chip === date;
-            return (
-              <Button
-                key={chip}
-                size="sm"
-                variant={selected ? "default" : "outline"}
-                onClick={() => goToDate(chip)}
-                disabled={pending}
-                aria-pressed={selected}
-                className="shrink-0"
-              >
-                {dateChipLabel(chip, today)}
-              </Button>
-            );
-          })}
-        </div>
-
-        <div className="mt-3 flex flex-col gap-3 lg:flex-row">
-          <div className="relative min-w-0 flex-1">
-            <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2" aria-hidden />
+      <div className="bg-background/85 sticky top-0 z-20 -mx-4 border-b border-white/10 px-4 py-2.5 backdrop-blur-md sm:-mx-8 sm:px-8">
+        <div className="flex items-center justify-between gap-3">
+          <h1 className="text-[15px] leading-none font-medium tracking-tight">
+            5C.
+          </h1>
+          <div className="relative w-36 min-w-0 sm:w-44">
+            <Search
+              className="pointer-events-none absolute top-1/2 left-2 size-3.5 -translate-y-1/2 text-zinc-500"
+              aria-hidden
+            />
             <Input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search dishes — birria, tofu scramble, pizza…"
+              placeholder="Search"
               aria-label="Search dishes"
-              className="h-9 bg-white pl-8"
+              className="h-8 border-white/10 bg-transparent pl-7 text-sm dark:bg-transparent"
             />
           </div>
-          <ToggleGroup
-            type="multiple"
-            value={diets}
-            onValueChange={(value) => setDiets(value as DietTag[])}
-            variant="outline"
-            size="sm"
-            className="flex-wrap justify-start"
-            aria-label="Dietary filters"
-          >
-            {DIET_OPTIONS.map((option) => (
-              <ToggleGroupItem key={option.id} value={option.id}>
-                {option.label}
-              </ToggleGroupItem>
-            ))}
-          </ToggleGroup>
         </div>
 
-        <div className="mt-3 flex gap-2 overflow-x-auto" role="tablist" aria-label="Meal">
-          {MEAL_TABS.map((tab) => (
-            <Button
-              key={tab.id}
-              size="sm"
-              variant={meal === tab.id ? "secondary" : "ghost"}
-              onClick={() => setMeal(tab.id)}
-              aria-pressed={meal === tab.id}
-              className={cn("shrink-0", meal === tab.id && "bg-stone-200")}
+        <div
+          className="mt-2 flex gap-0.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          role="navigation"
+          aria-label="Menu date"
+        >
+          {dates.map((chip) => (
+            <QuietButton
+              key={chip}
+              pressed={chip === date}
+              onClick={() => goToDate(chip)}
+              disabled={pending}
             >
-              {tab.label}
-              {tab.id === nowMeal ? (
-                <span className="text-muted-foreground ml-1 text-[0.65rem]">now</span>
-              ) : null}
-            </Button>
+              {dateChipLabel(chip, today)}
+            </QuietButton>
           ))}
         </div>
 
-        <div className="mt-2 flex gap-2 overflow-x-auto" aria-label="Dining hall">
-          <Button
-            size="xs"
-            variant={hallFilter === "all" ? "default" : "outline"}
-            onClick={() => setHallFilter("all")}
-            aria-pressed={hallFilter === "all"}
+        <div className="mt-0.5 flex items-center gap-2">
+          <div
+            className="flex min-w-0 flex-1 gap-0.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            role="tablist"
+            aria-label="Meal"
           >
-            All halls
-          </Button>
+            {MEAL_TABS.map((tab) => (
+              <QuietButton
+                key={tab.id}
+                pressed={meal === tab.id}
+                onClick={() => setMeal(tab.id)}
+              >
+                {tab.label}
+                {tab.id === nowMeal ? (
+                  <span className="ml-1 text-[10px] font-normal text-zinc-500" aria-hidden>
+                    now
+                  </span>
+                ) : null}
+              </QuietButton>
+            ))}
+          </div>
+          <details className="relative shrink-0">
+            <summary className="cursor-pointer list-none text-[13px] font-medium text-zinc-400 hover:text-zinc-100 [&::-webkit-details-marker]:hidden">
+              Diet
+              {diets.length ? (
+                <span className="text-zinc-500"> · {diets.length}</span>
+              ) : null}
+            </summary>
+            <ToggleGroup
+              type="multiple"
+              value={diets}
+              onValueChange={(value) => setDiets(value as DietTag[])}
+              variant="outline"
+              size="sm"
+              className="absolute top-full right-0 z-30 mt-2 max-w-[min(100vw-2rem,20rem)] flex-wrap justify-end border border-white/10 bg-[#0d0d0d] p-1"
+              aria-label="Dietary filters"
+            >
+              {DIET_OPTIONS.map((option) => (
+                <ToggleGroupItem key={option.id} value={option.id}>
+                  {option.label}
+                </ToggleGroupItem>
+              ))}
+            </ToggleGroup>
+          </details>
+        </div>
+
+        <div
+          className="mt-0.5 flex gap-0.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          aria-label="Dining hall"
+        >
+          <QuietButton
+            pressed={hallFilter === "all"}
+            onClick={() => setHallFilter("all")}
+          >
+            All
+          </QuietButton>
           {HALLS.map((hall) => (
-            <Button
+            <QuietButton
               key={hall.id}
-              size="xs"
-              variant={hallFilter === hall.id ? "default" : "outline"}
+              pressed={hallFilter === hall.id}
               onClick={() => setHallFilter(hall.id)}
-              aria-pressed={hallFilter === hall.id}
-              className="shrink-0"
             >
               <span
-                className="mr-1.5 inline-block size-2 rounded-full"
+                className="mr-1.5 inline-block size-1.5 rounded-full"
                 style={{ background: hall.accent }}
                 aria-hidden
               />
               {hall.shortName}
-            </Button>
+            </QuietButton>
           ))}
         </div>
       </div>
 
-      <p className="text-muted-foreground mt-4 text-sm">
-        {pending
-          ? "Loading menus from the dining sites…"
-          : `${totalItems} dishes across ${shown.filter((h) => countItems(h) > 0).length || shown.length} halls · refreshed from source sites about every 15 minutes`}
-      </p>
-
       <div
         id="menus"
         className={cn(
-          "mt-4 grid gap-4 lg:grid-cols-2",
+          "mt-5 grid gap-4 lg:grid-cols-2 lg:gap-5",
           pending && "opacity-60",
         )}
       >
@@ -205,25 +229,13 @@ export function MenuBoard({
       </div>
 
       {q && totalItems === 0 ? (
-        <div className="border-border mt-8 rounded-2xl border border-dashed px-6 py-10 text-center">
-          <p className="font-heading text-2xl">Nothing matched “{query.trim()}”</p>
-          <p className="text-muted-foreground mt-2 text-sm">
-            Try another dish name, clear the diet filters, or switch meals.
-          </p>
-        </div>
+        <p className="mt-10 text-sm text-zinc-400">
+          Nothing matched “{query.trim()}”.
+        </p>
       ) : null}
 
-      <footer className="text-muted-foreground mt-12 border-t pt-6 text-xs leading-relaxed">
-        <p>
-          5cMenu aggregates Claremont Colleges dining: McConnell at Pitzer,
-          Malott at Scripps, Collins at CMC, Hoch-Shanahan at Harvey Mudd, and
-          Frary and Frank at Pomona. Menus are read from the official public
-          pages and do not replace them.
-        </p>
-        <p className="mt-2">
-          Hours and dishes change. When something looks off, open the source
-          link on that hall. Production only — there is no staging branch.
-        </p>
+      <footer className="mt-16 text-[11px] text-zinc-500">
+        Official 5C dining menus, in one place.
       </footer>
     </div>
   );

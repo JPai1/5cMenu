@@ -15,29 +15,17 @@ export default function TwitterImage() {
           flexDirection: "column",
           justifyContent: "space-between",
           padding: "72px",
-          background: "#3f6b4a",
-          color: "#f6f1e8",
+          background: "#0d0d0d",
+          color: "#ffffff",
         }}
       >
-        <div style={{ display: "flex", fontSize: 28, letterSpacing: 6, textTransform: "uppercase" }}>
-          Claremont Colleges
+        <div style={{ display: "flex", fontSize: 28, letterSpacing: -0.5 }}>
+          5C.
         </div>
         <div style={{ display: "flex", flexDirection: "column" }}>
-          <div style={{ fontSize: 96, fontWeight: 600, lineHeight: 1 }}>5cMenu</div>
-          <div style={{ marginTop: 20, fontSize: 34, maxWidth: 820 }}>
-            McConnell, Malott, Collins, Hoch-Shanahan, Frary, and Frank — live, by station.
+          <div style={{ fontSize: 96, fontWeight: 600, lineHeight: 1, letterSpacing: -2 }}>
+            5cMenu
           </div>
-        </div>
-        <div style={{ display: "flex", gap: 16, fontSize: 22 }}>
-          <span>Pitzer</span>
-          <span>·</span>
-          <span>Scripps</span>
-          <span>·</span>
-          <span>CMC</span>
-          <span>·</span>
-          <span>Harvey Mudd</span>
-          <span>·</span>
-          <span>Pomona</span>
         </div>
       </div>
     ),

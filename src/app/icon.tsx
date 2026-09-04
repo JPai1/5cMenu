@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const size = { width: 32, height: 32 };
+export const size = { width: 64, height: 64 };
 export const contentType = "image/png";
 
 export default function Icon() {
@@ -13,14 +13,14 @@ export default function Icon() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "#3f6b4a",
-          color: "#f6f1e8",
-          fontSize: 16,
-          fontWeight: 700,
-          letterSpacing: -0.5,
+          background: "#0d0d0d",
+          color: "#ffffff",
+          fontSize: 22,
+          fontWeight: 600,
+          letterSpacing: -0.8,
         }}
       >
-        5c
+        5C.
       </div>
     ),
     size,
