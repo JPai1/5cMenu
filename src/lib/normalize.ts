@@ -7,12 +7,18 @@ export function titleCase(value: string) {
     .replace(/[_-]+/g, " ")
     .replace(/\s+/g, " ")
     .trim()
-    .replace(/\b\w/g, (ch) => ch.toUpperCase());
+    .toLowerCase()
+    .replace(/(^|[\s/])([a-z])/g, (_, edge: string, ch: string) => edge + ch.toUpperCase());
 }
 
 export function cleanText(value: unknown): string | undefined {
   if (typeof value !== "string") return undefined;
-  const text = value.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+  const text = value
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s*\/\s*description\s*$/i, "")
+    .replace(/\s*[-–]\s*description(?: only)?\s*$/i, "")
+    .replace(/\s+/g, " ")
+    .trim();
   return text || undefined;
 }
 
@@ -43,7 +49,7 @@ export function normalizeMealName(raw: string): MealName {
 }
 
 export function isExtraStation(name: string) {
-  return /condiment|beverage|cereal|topping|breads?|bagel|spread|bar extras|miscellaneous|always/i.test(
+  return /condiment|beverage|cereal|topping|breads?|bagel|spread|bar extras|miscellaneous|always|salad bar|juice|smoothie|deli|build your own sandwich|grill bread|pasta express|breakfast bar/i.test(
     name,
   );
 }

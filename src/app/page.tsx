@@ -1,5 +1,5 @@
 import { MenuBoard } from "@/components/menu-board";
-import { getMenus, resolveMenuDate } from "@/lib/menus";
+import { resolveMenuDate } from "@/lib/menus";
 import { todayOnCampus } from "@/lib/time";
 
 export default async function Page({
@@ -9,7 +9,6 @@ export default async function Page({
 }) {
   const params = await searchParams;
   const date = resolveMenuDate(params.date);
-  const menus = await getMenus(date);
 
-  return <MenuBoard initial={menus} today={todayOnCampus()} />;
+  return <MenuBoard date={date} today={todayOnCampus()} />;
 }
