@@ -2,6 +2,8 @@
 
 One site for every Claremont Colleges dining hall. 5cMenu pulls today’s (and nearby days’) menus from the official sources, then shows the dishes, the hall, and the station so you can decide where to eat without opening six tabs.
 
+**Live:** [5cmenu.vercel.app](https://5cmenu.vercel.app) · **Code:** [github.com/JPai1/5cMenu](https://github.com/JPai1/5cMenu)
+
 Halls:
 
 - **McConnell** — Pitzer ([cafebonappetit.com](https://pitzer.cafebonappetit.com/))
@@ -38,9 +40,9 @@ Crawlers get the full menu HTML (not a client-only fetch), plus:
 
 ## Deploy on Vercel (production only)
 
-This repo ships straight to production from `main` on [JPai1/5cMenu](https://github.com/JPai1/5cMenu). There is no staging branch.
+This repo ships straight to production from `main` on [JPai1/5cMenu](https://github.com/JPai1/5cMenu). There is no staging branch. Production is [5cmenu.vercel.app](https://5cmenu.vercel.app) on Jathan’s Vercel team.
 
-`vercel.json` skips builds on any branch that is not `main`.
+`vercel.json` skips builds on any branch that is not `main`. To reconnect automatic Git deploys, install the [Vercel GitHub app](https://github.com/apps/vercel) on `JPai1/5cMenu`.
 
 No environment variables are required. The app reads public menu pages and public JSON the colleges already expose.
 
